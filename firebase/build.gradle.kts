@@ -11,10 +11,10 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinxSerialization)
     id("com.vanniktech.maven.publish") version "0.30.0"
+    id("maven-publish")
 }
 kotlin {
     androidTarget {
-        publishLibraryVariants("release")
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -71,8 +71,31 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
+
+tasks.register("printComponents") {
+    doLast {
+        println("Available components:")
+        components.forEach { println("- ${it.name}") }
+    }
+}
+
 group = "com.dwarshb.firebase"
-version = "1.0"
+version = "1.0.0"
+
+publishing {
+    publications {
+        create<MavenPublication>("kotlin") {
+            from(components["kotlin"])
+            groupId = "com.dwarshb"
+            artifactId = "firebase-cmp"
+            version = "1.0.0"
+        }
+    }
+
+    repositories {
+        mavenLocal() // <-- this will publish to ~/.m2/repository
+    }
+}
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)

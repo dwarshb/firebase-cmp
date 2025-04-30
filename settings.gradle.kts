@@ -29,6 +29,4 @@ dependencyResolutionManagement {
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     }
 }
-
-include(":composeApp")
 include(":firebase")
