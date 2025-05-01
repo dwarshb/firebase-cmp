@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
     id("com.vanniktech.maven.publish") version "0.30.0"
     id("maven-publish")
+    signing
 }
 kotlin {
     androidTarget {
@@ -79,23 +80,8 @@ tasks.register("printComponents") {
     }
 }
 
-group = "com.dwarshb.firebase"
+group = "io.github.dwarshb"
 version = "1.0.0"
-
-publishing {
-    publications {
-        create<MavenPublication>("kotlin") {
-            from(components["kotlin"])
-            groupId = "com.dwarshb"
-            artifactId = "firebase-cmp"
-            version = "1.0.0"
-        }
-    }
-
-    repositories {
-        mavenLocal() // <-- this will publish to ~/.m2/repository
-    }
-}
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
