@@ -81,7 +81,7 @@ tasks.register("printComponents") {
 }
 
 group = "io.github.dwarshb"
-version = "1.0.0"
+version = "1.0.1"
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
