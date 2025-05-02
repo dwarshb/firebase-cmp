@@ -1,3 +1,7 @@
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.dwarshb/firebase-cmp)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/dwarshb/firebase-cmp/publish.yml)
+![GitHub top language](https://img.shields.io/github/languages/top/dwarshb/firebase-cmp)
+
 # Firebase-CMP 🔥
 A Compose Multiplatform library that leverages Firebase Rest API to integrate features like Firebase Authentication, Firebase RealtimeDatabase and Gemini in multiplatform application targeting Android, iOS, Desktop & Web.
 
