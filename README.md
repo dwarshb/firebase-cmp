@@ -13,8 +13,11 @@ We have seen that there are multiple Firebase SDK available for Android, iOS & W
 ```gradle
 commonMain {
   implementation("io.github.dwarshb:firebase-cmp:1.0.1")
+  //Ktor Dependencies
 }
 ```
+> #### :red_circle: Important - Make sure to add Ktor dependencies as well in your project. Check https://ktor.io/docs/client-create-multiplatform-application.html#code
+
 Once the dependency is added, Sync the project
 
 ---
