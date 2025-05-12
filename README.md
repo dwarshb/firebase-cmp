@@ -12,7 +12,7 @@ We have seen that there are multiple Firebase SDK available for Android, iOS & W
 ### 1. Add dependency in build.gradle
 ```gradle
 commonMain {
-  implementation("io.github.dwarshb:firebase-cmp:1.0.1")
+  implementation("io.github.dwarshb:firebase-cmp:1.0.2")
   //Ktor Dependencies
 }
 ```
@@ -176,7 +176,7 @@ Currently Gemini class provides two method generatePrompt and Conversational AI
 val gemini = Gemini()
 
 
-gemini.generatePrompt("Hey, whats the whether today",
+gemini.prompt("Hey, whats the whether today",
     object : onCompletion<String> {
         override fun onSuccess(response: String) {
             //Handle response

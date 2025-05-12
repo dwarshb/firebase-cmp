@@ -38,7 +38,7 @@ class FirebaseDatabase {
         val idToken = Firebase.getCurrentUser()?.idToken
 
         val childPath = child.joinToString("/")
-        println("Path: ${childPath}")
+        println("$parameter \n ${childPath}")
         val responseBody = httpClient
             .patch("${DATABASE_URL}/${childPath}.json?auth=${idToken}") {
                 header("Content-Type", "application/json")

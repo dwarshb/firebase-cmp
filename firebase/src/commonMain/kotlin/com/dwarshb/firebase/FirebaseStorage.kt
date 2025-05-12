@@ -48,7 +48,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class FirebaseStorage() {
+@ExperimentalMultiplatform()
+class FirebaseStorage {
     private val STORAGE_URL = Firebase.getStorageURL()
     private val currentUser = Firebase.getCurrentUser()
     private val httpClient = HttpClient() {
@@ -60,16 +61,16 @@ class FirebaseStorage() {
 
     suspend fun updateFirebaseStorage(
         child: List<String>,
-        parameter: HashMap<String,Any>,
         file: File,
+        mimeType: String,
         onCompletion: onCompletion<String>) {
         val fileBytes = file.byteArray
         val idToken = currentUser?.idToken
         val childPath = child.joinToString("/")
         println("Path: ${fileBytes}")
-        val responseBody = httpClient.post("${STORAGE_URL}?uploadType=media&name=messages/${file.name}") {
+        val responseBody = httpClient.post("${STORAGE_URL}?uploadType=media&name=$childPath/${file.name}") {
             header(HttpHeaders.Authorization, "Bearer $idToken")
-            header(HttpHeaders.ContentType, "image/jpeg")
+            header(HttpHeaders.ContentType, mimeType)
             setBody(fileBytes)
         }
 
@@ -83,15 +84,15 @@ class FirebaseStorage() {
         }
     }
 
-    suspend fun readFirebaseDatabase(
+    suspend fun readFirebaseStorage(
         child: List<String>,
-        query: String,
         onCompletion: onCompletion<String>) {
         val idToken = currentUser?.idToken
         val childPath = child.joinToString("/")
 
         val responseBody = httpClient
-            .get("${STORAGE_URL}${childPath}.json?auth=${idToken}&${query}") {
+            .get("${STORAGE_URL}$childPath") {
+                header(HttpHeaders.Authorization, "Bearer $idToken")
                 header("Content-Type", "application/json")
             }
 
@@ -103,53 +104,6 @@ class FirebaseStorage() {
                     "${responseBody.request.url} ${responseBody.bodyAsText()}"
                 )
             )
-        }
-    }
-
-
-
-    data class Event(val name: String = "", val data: String = "")
-
-    fun getEventsFlow(child: List<String>, query: String): Flow<Event> = flow {
-        coroutineScope {
-            while (isActive) {
-                val idToken = currentUser?.idToken
-                val childPath = child.joinToString("/")
-
-                val conn = httpClient.prepareGet(
-                    "${STORAGE_URL}${childPath}.json?auth=${idToken}&${query}"
-                ) {
-                    header(HttpHeaders.Accept, "text/event-stream")
-                    header(HttpHeaders.Connection, "keep-alive")
-                }
-                conn.execute { response ->
-                    println("Connection:" + response)
-
-                    var inputReader = response.bodyAsChannel()
-                    var event = Event()
-                    // run forever
-                    while (true) {
-                        val line = inputReader.readUTF8Line()
-                            .toString() // Blocking function. Read stream until \n is found
-
-                        when {
-                            line.startsWith("event:") -> { // get event name
-                                event = event.copy(name = line.substring(6).trim())
-                            }
-
-                            line.startsWith("data:") -> { // get data
-                                event = event.copy(data = line.substring(5).trim())
-                            }
-
-                            line.isEmpty() -> { // empty line, finished block. Emit the event
-                                emit(event)
-                                event = Event()
-                            }
-                        }
-                        println(event.name)
-                    }
-                }
-            }
         }
     }
 }

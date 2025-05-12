@@ -9,6 +9,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -40,7 +41,17 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 
 @Serializable
-data class Part(val text: String)
+data class Part(val text: String? = null,
+                @SerialName("inline_data")
+                val inlineData: InlineData? = null
+)
+
+@Serializable
+data class InlineData(
+    @SerialName("mime_type")
+    val mimeType: String,
+    val data: String // Base64 encoded image data
+)
 
 @Serializable
 data class Content(
@@ -64,13 +75,13 @@ class Gemini {
         install(HttpRedirect)
     }
 
-    suspend fun conversationalAI(personaPrompt: String,
+    suspend fun conversationalAI(systemInstruction: String,
                                  listOfContent: List<Content>,
                                  onCompletion: onCompletion<String>) {
        try {
            val requestBody = RequestBody(
                system_instruction = Content(
-                   parts = listOf(Part(text = personaPrompt))
+                   parts = listOf(Part(text = systemInstruction))
                ),
                contents = listOfContent
            )
@@ -96,19 +107,24 @@ class Gemini {
            onCompletion.onError(e)
        }
     }
-    suspend fun generatePrompt(generalPrompt: String, onCompletion: onCompletion<String>) {
+    suspend fun prompt(generalPrompt: String,
+                       imageData: String = "",
+                       mimeType: String = "",
+                       onCompletion: onCompletion<String>) {
         try {
             val requestBody = RequestBody(
                 contents = listOf(
                     Content(
                         parts = listOf(
-                            Part(text = generalPrompt)
+                            Part(text = generalPrompt),
+                            Part(inlineData = InlineData(mimeType = mimeType, data = imageData)
+                            )
                         )
                     )
                 )
             )
-
             val jsonBody = Json.encodeToString(requestBody)
+            println(jsonBody)
             val responseBody = httpClient
                 .post("${GEMINI_URL}/${model}:generateContent?key=$geminiApiKey") {
                     header("Content-Type", "application/json")

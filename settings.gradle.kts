@@ -1,4 +1,4 @@
-rootProject.name = "chAItalk"
+rootProject.name = "Firebase-CMP"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
